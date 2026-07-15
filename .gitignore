@@ -1,0 +1,17 @@
+# Keil MDK
+Objects/
+Listings/
+DebugConfig/
+
+# User settings
+*.uvoptx
+
+# Build files
+*.o
+*.d
+*.axf
+*.map
+*.lst
+*.log
+
+Thumbs.db
