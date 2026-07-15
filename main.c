@@ -3,8 +3,8 @@
 #include <string.h>
 
 #define LCD_ADDR        0x27            /* Adresse I2C du module PCF8574 */
-#define WIFI_SSID       "TOPNET_5ED0"
-#define WIFI_PASS       "191919982761998"
+#define WIFI_SSID       ""
+#define WIFI_PASS       ""
 #define TS_KEY          "7USUV7VSGNB7UTVK"
 #define MQTT_BROKER     "192.168.1.15"
 #define MQTT_PORT       "1883"
@@ -167,7 +167,7 @@ void init_dma1_pour_uart2_tx(void)
 {
     RCC->AHB1ENR |= (1 << 21); /* DMA1 */
     DMA1_Stream6->CR = 0;//Efface ancienne configuration DMA.
-    while (DMA1_Stream6->CR & 1);//Attendre désactivation comléte de dma
+    while (DMA1_Stream6->CR & 1);//Attendre dÃ©sactivation comlÃ©te de dma
     DMA1_Stream6->CR |= (4 << 25); /* Channel 4 (USART2 TX) Relie DMA au USART2_TX. */
     DMA1_Stream6->CR |= (0 << 13); /* Taille memoire : 8 bits */
     DMA1_Stream6->CR |= (0 << 11); /* Taille peripherique : 8 bits */
@@ -184,15 +184,15 @@ void init_usart3_esp32(void)
 {
     RCC->APB1ENR |= (1 << 18); /* USART3 */
     RCC->AHB1ENR |= (1 << 2);  /* GPIOC */
-    GPIOC->MODER &= ~((3 << 20) | (3 << 22));//On remet à zéro avant nouvelle configuration.
+    GPIOC->MODER &= ~((3 << 20) | (3 << 22));//On remet Ã  zÃ©ro avant nouvelle configuration.
     GPIOC->MODER |=  ((2 << 20) | (2 << 22)); /* PC10 et PC11 en mode AF */
     GPIOC->AFR[1] &= ~((0xF << 8) | (0xF << 12));//Effacer ancienne fonction alternative
-    GPIOC->AFR[1] |=  ((7 << 8) | (7 << 12)); /* Connecter pins à USART3 AF7 = USART3 */
+    GPIOC->AFR[1] |=  ((7 << 8) | (7 << 12)); /* Connecter pins Ã  USART3 AF7 = USART3 */
     USART3->BRR = 0x8B; /* 115200 bauds @ 16MHz */
     USART3->CR1 = 0; //USART3->CR1 = 0
-    USART3->CR1 |= (1 << 3);  /* TE Autoriser émission.*/
-    USART3->CR1 |= (1 << 2);  /* RE Autoriser réception */
-    USART3->CR1 |= (1 << 13); /* UE Démarrer USART3 */
+    USART3->CR1 |= (1 << 3);  /* TE Autoriser Ã©mission.*/
+    USART3->CR1 |= (1 << 2);  /* RE Autoriser rÃ©ception */
+    USART3->CR1 |= (1 << 13); /* UE DÃ©marrer USART3 */
 }
 
 /* GPIO pour PWM TIM3 : PA6(CH1), PA7(CH2), PB0(CH3), PB1(CH4) */
@@ -202,11 +202,11 @@ void init_gpio_pwm(void)
     GPIOA->MODER &= ~((3 << 12) | (3 << 14)); //Nettoyer configuration des pins.
     GPIOA->MODER |=  ((2 << 12) | (2 << 14)); //Relier pins au timer TIM3.
     GPIOA->AFR[0] &= ~((0xF << 24) | (0xF << 28));//Effacer ancienne fonction alternative.
-    GPIOA->AFR[0] |=  ((2 << 24) | (2 << 28)); /* Associer pins à TIM3 AF2 = TIM3 */
+    GPIOA->AFR[0] |=  ((2 << 24) | (2 << 28)); /* Associer pins Ã  TIM3 AF2 = TIM3 */
     GPIOB->MODER &= ~((3 << 0) | (3 << 2)); //Nettoyer PB0 PB1.
     GPIOB->MODER |=  ((2 << 0) | (2 << 2)); //Relier PB0 PB1 au timer
     GPIOB->AFR[0] &= ~((0xF << 0) | (0xF << 4)); //Effacer ancienne fonction alternative
-    GPIOB->AFR[0] |=  ((2 << 0) | (2 << 4));/* Associer pins à TIM3 AF2 = TIM3 */
+    GPIOB->AFR[0] |=  ((2 << 0) | (2 << 4));/* Associer pins Ã  TIM3 AF2 = TIM3 */
 }
 /* TIM3 : 4 canaux PWM a 1 kHz (16MHz/16/1000)
    CCR1..CCR4 controle les 4 demi-ponts du pont en H */
@@ -214,12 +214,12 @@ void init_tim3_pwm(void)
 {
     RCC->APB1ENR |= (1 << 1);
     TIM3->PSC     = 15; //  f/ PSC+1 = 16 16MHz / 16 = 1MHz
-    TIM3->ARR     = 999; //Définir période PWM.
+    TIM3->ARR     = 999; //DÃ©finir pÃ©riode PWM.
     /* Mode PWM 1 sur les 4 canaux (OC1M = 110) */
     TIM3->CCMR1  |= (6 << 4) | (6 << 12); // Configure :CH1 CH2 PWM en Mode 1
     TIM3->CCMR2  |= (6 << 4) | (6 << 12); // Configure :CH1 CH2 PWM en Mode 1
     TIM3->CCER   |= (1 << 0) | (1 << 4) | (1 << 8) | (1 << 12);/* Activer les 4 sorties */
-    TIM3->CCR1 = TIM3->CCR2 = TIM3->CCR3 = TIM3->CCR4 = 0;/* Mettre PWM à 0% = Valeur initiale : tout a 0 (moteurs arretes) */
+    TIM3->CCR1 = TIM3->CCR2 = TIM3->CCR3 = TIM3->CCR4 = 0;/* Mettre PWM Ã  0% = Valeur initiale : tout a 0 (moteurs arretes) */
     TIM3->CR1 |= (1 << 0); /* Demarrer TIM3 */
 }
 /* I2C2 : bus pour le LCD 16x2 sur PB10(SCL) / PB11(SDA)
@@ -229,29 +229,29 @@ void init_i2c2_lcd(void)
     RCC->AHB1ENR |= (1 << 1);  /* Activer GPIOB */
     RCC->APB1ENR |= (1 << 22); /* Activer I2C */
     GPIOB->MODER  &= ~((3 << 20) | (3 << 22));//Nettoyer MODER
-    GPIOB->MODER  |=  ((2 << 20) | (2 << 22)); /* PB10/PB11 AF connecter pins au périphérique I2C2.*/
+    GPIOB->MODER  |=  ((2 << 20) | (2 << 22)); /* PB10/PB11 AF connecter pins au pÃ©riphÃ©rique I2C2.*/
     GPIOB->OTYPER |=   (1 << 10) | (1 << 11);  /* Open-drain pour I2C */
-    GPIOB->PUPDR  &= ~((3 << 20) | (3 << 22)); /* Désactiver pull internes (resistances externes) */
+    GPIOB->PUPDR  &= ~((3 << 20) | (3 << 22)); /* DÃ©sactiver pull internes (resistances externes) */
     GPIOB->OSPEEDR|=  (3 << 20) | (3 << 22);   /* Vitesse max Haute vitesse GPIO*/
     GPIOB->AFR[1] &= ~((0xF << 8) | (0xF << 12));// Nettoyer Alternate Function.
-    GPIOB->AFR[1] |=  ((4 << 8) | (4 << 12));  /* AF4 = I2C2 ... Associer pins à I2C2. */
-    I2C2->CR1  = I2C_CR1_SWRST; /* Réinitialiser bus I2C.*/
+    GPIOB->AFR[1] |=  ((4 << 8) | (4 << 12));  /* AF4 = I2C2 ... Associer pins Ã  I2C2. */
+    I2C2->CR1  = I2C_CR1_SWRST; /* RÃ©initialiser bus I2C.*/
     I2C2->CR1  = 0; //Fin reset sortir de reset
     I2C2->CR2  = 16;   /* Frequence APB1 = 16 MHz */
-    I2C2->CCR  = 80;   /* 1/16MHZ = 62.5ns* 80 = 5µs = Thigh = Tlow période total 10µs f=1/10us=100khz... Configurer vitesse I2C. */
+    I2C2->CCR  = 80;   /* 1/16MHZ = 62.5ns* 80 = 5Âµs = Thigh = Tlow pÃ©riode total 10Âµs f=1/10us=100khz... Configurer vitesse I2C. */
     I2C2->TRISE = 17;  /* Temps de montee max : (1000ns max / 62.5ns) + 1 */
     I2C2->CR1 |= I2C_CR1_PE; /* Activer I2C2 */
 }
 /* Priorites NVIC : USART2 le plus urgent, DMA le moins urgent */
 void init_priorites_nvic(void)
-{NVIC_SetPriority(USART2_IRQn,0); //USART2 reçoit commandes robot
-NVIC_SetPriority(EXTI0_IRQn,1);//Interruptions externes priorité élevée.
-NVIC_SetPriority(TIM4_IRQn,2);//Timer périodique priorité moyenne horloge_iot
-NVIC_SetPriority(DMA2_Stream0_IRQn,3); //IRQ DMA ADC priorité plus faible ADC moins critique que
-NVIC_SetPriority(DMA1_Stream6_IRQn,4); //Fin transmission UART DMA priorité faible Car transmission TX non critique CPU peut attendre
+{NVIC_SetPriority(USART2_IRQn,0); //USART2 reÃ§oit commandes robot
+NVIC_SetPriority(EXTI0_IRQn,1);//Interruptions externes prioritÃ© Ã©levÃ©e.
+NVIC_SetPriority(TIM4_IRQn,2);//Timer pÃ©riodique prioritÃ© moyenne horloge_iot
+NVIC_SetPriority(DMA2_Stream0_IRQn,3); //IRQ DMA ADC prioritÃ© plus faible ADC moins critique que
+NVIC_SetPriority(DMA1_Stream6_IRQn,4); //Fin transmission UART DMA prioritÃ© faible Car transmission TX non critique CPU peut attendre
 }
 /* Delai bloquant simple base sur une boucle vide ---- 16MHz=16 000 000 cycles/s ---1 cycle dure  1/16MHz= 62.5ns
-1600 tours ˜ 1 ms
+1600 tours Â˜ 1 ms
 */
 void delai_ms(uint32_t ms)
 {
@@ -262,13 +262,13 @@ for (volatile uint32_t i = 0; i < ms * 1600; i++);
    car le DMA continue a lire la RAM apres le retour de cette fonction. */
 void uart2_envoie_dma(char *texte, uint16_t taille)
 {
-    while (tx_occupe); /* Attendre que le precedent envoi soit -- termine Empêcher deux DMA simultanés. */
-    tx_occupe = 1; //Verrouiller DMA -- signal qu'elle est occupé
+    while (tx_occupe); /* Attendre que le precedent envoi soit -- termine EmpÃªcher deux DMA simultanÃ©s. */
+    tx_occupe = 1; //Verrouiller DMA -- signal qu'elle est occupÃ©
     DMA1_Stream6->CR &= ~(1 << 0); //Stopper DMA avant reconfiguration.
-    while (DMA1_Stream6->CR & 1); //Attendre arrêt complet car DMA prend quelques cycles pour s’arrêter physiquement.
+    while (DMA1_Stream6->CR & 1); //Attendre arrÃªt complet car DMA prend quelques cycles pour sÂ’arrÃªter physiquement.
     DMA1->HIFCR |= (0x3F << 16);/* Effacer les flags du stream 6 == High Interrupt Flag Clear Register  */
-    DMA1_Stream6->M0AR = (uint32_t)texte; //Donner adresse mémoire source
-    DMA1_Stream6->NDTR = taille; //Nombre de données à transférer
+    DMA1_Stream6->M0AR = (uint32_t)texte; //Donner adresse mÃ©moire source
+    DMA1_Stream6->NDTR = taille; //Nombre de donnÃ©es Ã  transfÃ©rer
     DMA1_Stream6->CR  |= (1 << 0);/* Lancer le transfert */
     USART2->SR &= ~(1 << 6);/* Effacer flag Transmission Complete TC avant envoi */
 }
@@ -278,17 +278,17 @@ void uart2_envoie_dma(char *texte, uint16_t taille)
    - Fin de reponse detectee par silence de 10ms
    - La reponse est ensuite relayee vers le Bluetooth pour monitoring */
 void esp32_envoie_et_lis(char *texte)
-{		int idx = 0; //Index de stockage c haque caractère reçu sera stocké dans esp_reponse[idx]
+{		int idx = 0; //Index de stockage c haque caractÃ¨re reÃ§u sera stockÃ© dans esp_reponse[idx]
 		uint32_t timeout;
 /* Vider le buffer RX de tout octet residuel avant d'envoyer */
 		while (USART3->SR & USART_SR_RXNE) //Lecture DR vide automatiquement RXNE
 {volatile char flush = USART3->DR;
 (void)flush;}
 /* Envoyer la commande AT caractere par caractere */
-	char *p = texte; //Pointeur parcours chaîne
+	char *p = texte; //Pointeur parcours chaÃ®ne
 	while (*p) //Tant que *p != '\0' continuer
-{while ((USART3->SR & (1 << 7)) == 0);/* Attendre TXE TXE=0 USART encore occupé si non il est prêt a recevoir nouveau caractère. */
-		USART3->DR = *p++;} //Envoi caractère
+{while ((USART3->SR & (1 << 7)) == 0);/* Attendre TXE TXE=0 USART encore occupÃ© si non il est prÃªt a recevoir nouveau caractÃ¨re. */
+		USART3->DR = *p++;} //Envoi caractÃ¨re
 		timeout = 3000 * 1600;/* Attendre le premier octet de reponse (3 secondes max) */
 while (!(USART3->SR & USART_SR_RXNE)) //tant que RXNE=0 attendre
 {		
@@ -296,12 +296,12 @@ if (--timeout == 0) goto fin;} //Saut direct
 /* Lire tous les octets jusqu'a 10ms de silence = fin de reponse */
 while (idx < 118)
 {
-	timeout = 10 * 1600; //* Si 10ms sans nouveau caractèrealors réponse terminée */
+	timeout = 10 * 1600; //* Si 10ms sans nouveau caractÃ¨realors rÃ©ponse terminÃ©e */
 while (!(USART3->SR & USART_SR_RXNE))
 {
 if (--timeout == 0) goto fin;
 } 
-esp_reponse[idx++] = (char)USART3->DR; //Lecture caractère
+esp_reponse[idx++] = (char)USART3->DR; //Lecture caractÃ¨re
 }
 fin:
 esp_reponse[idx] = '\0';
